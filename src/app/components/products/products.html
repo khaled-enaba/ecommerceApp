@@ -1,0 +1,35 @@
+
+
+<h1>total price is : {{ totalprice }}</h1>
+<h2>Selected Category Is : {{ selectCatId }}</h2>
+
+<div class="mb-3">
+    <label for="" class="form-label">Category</label>
+    <select
+        class="form-select form-select-lg"
+        [(ngModel)]="selectCatId"
+        name=""
+        id="" 
+    >
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.name }}</option>
+       
+    </select>
+</div>
+
+
+<div class="row row-cols-2 row-cols-md-3 g-4" >
+  <div class="col" *ngFor="let product of products; let i = index " [class.d-none]="product.catId != selectCatId">
+    <div class="card">
+      <img [src]="product.imageUrl" class="card-img-top" alt="{{ product.name }}" [style]="'height:300px;object-fit:cover;background-color:lightgray;'"/>
+      <div class="card-body" [style]="(product.quantity === 0) ? 'opacity:0.5' : ''">
+        <h5 class="card-title">{{ product.name }} {{i + 1}}</h5>
+        <p class="card-text">{{ product.description }}</p>
+        <p class="card-text">Price: ${{ product.price }}</p>
+        <p class="card-text">Available Quantity: {{ product.quantity }}</p>
+        <input type="number" [class.d-none]="product.quantity === 0" #countInput>
+        <!-- <button class="btn btn-primary" (click)="totalprice += product.price * countInput.valueAsNumber">Buy</button> -->
+        <button class="btn btn-primary" [class.d-none]="product.quantity === 0" (click)="buy(countInput.value , product.price)">Buy</button>
+      </div>
+    </div>
+  </div>
+</div>

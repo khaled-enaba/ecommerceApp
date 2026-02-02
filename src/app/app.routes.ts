@@ -20,6 +20,7 @@ export const routes: Routes = [
       { path: 'products/:id', loadComponent: () => import('./features/product-details/product-details').then(m => m.ProductDetails) },
       { path: 'about', component: About },
       { path: 'contact', component: Contact },
+      {path:'profile', component:ProfileComponent},
       { path: 'cart', component: Cart },
       {path: 'best-sellers', loadComponent: () => import('./shared/components/best-seller/best-seller').then(m => m.BestSeller)},
       {

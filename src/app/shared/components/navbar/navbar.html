@@ -7,6 +7,7 @@
     <li routerLink="/about" routerLinkActive="active">About</li>
     <li routerLink="/contact" routerLinkActive="active">Contact</li>
     <li *ngIf="auth.currentUser() && auth.isAdmin()" routerLink="/dashboard" routerLinkActive="active">Dashboard</li>
+    <li *ngIf="auth.currentUser()" routerLink="/profile" routerLinkActive="active">Profile</li>
   </ul>
 
   <div class="nav-right">

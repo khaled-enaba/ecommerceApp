@@ -1,0 +1,24 @@
+<div class="reports-container">
+    <div class="reports-header">
+        <h1>Advanced Analytics & Reports</h1>
+        <p>Comprehensive data extraction and visualization engine.</p>
+    </div>
+
+    <div class="tabs-navigation">
+        <button [class.active]="activeTab() === 'sales'" (click)="switchTab('sales')">💰 Sales Report</button>
+        <button [class.active]="activeTab() === 'products'" (click)="switchTab('products')">📦 Product Stats</button>
+        <button [class.active]="activeTab() === 'users'" (click)="switchTab('users')">👥 User Growth</button>
+        <button [class.active]="activeTab() === 'orders'" (click)="switchTab('orders')">🛒 Order History</button>
+    </div>
+
+    <div class="report-content">
+        <div *ngIf="isLoading()" class="loader-overlay">
+            <div class="spinner"></div>
+            <span>Processing data...</span>
+        </div>
+
+        <app-data-exporter *ngIf="!isLoading()" [title]="activeTab().toUpperCase() + ' REPORT'"
+            [columns]="reportColumns" [data]="reportData()" [filename]="activeTab() + '_report.pdf'">
+        </app-data-exporter>
+    </div>
+</div>

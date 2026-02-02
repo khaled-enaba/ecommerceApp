@@ -1,0 +1,62 @@
+<div class="contact-wrapper">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <span class="sub-title">Connect</span>
+                <h1>Get In Touch</h1>
+                <p>Have a question or just want to say hello? Our team is always ready to assist you in finding your
+                    perfect style.</p>
+
+                <div class="info-list">
+                    <div class="info-item">
+                        <div class="icon">📍</div>
+                        <div>
+                            <strong>Visit Us</strong>
+                            <p>123 Fashion Ave, Design District <br>New York, NY 10001</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="icon">✉️</div>
+                        <div>
+                            <strong>Email Us</strong>
+                            <p>hello@km-store.com</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="icon">📞</div>
+                        <div>
+                            <strong>Call Us</strong>
+                            <p>+1 (555) FASH-ION</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form-card">
+                <form (ngSubmit)="onSubmit()">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" placeholder="john@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Subject</label>
+                        <select>
+                            <option>General Inquiry</option>
+                            <option>Order Support</option>
+                            <option>Partnership</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Message</label>
+                        <textarea placeholder="How can we help?" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

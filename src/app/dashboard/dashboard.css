@@ -1,0 +1,8 @@
+.row{
+    display: flex;
+}
+
+.dashboardBody{
+    padding: 20px;
+    width: 100%;
+}

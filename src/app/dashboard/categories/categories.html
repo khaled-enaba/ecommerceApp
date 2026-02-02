@@ -1,0 +1,65 @@
+<div class="categories-container" [class.modal-view]="isModal">
+    <div class="header" *ngIf="!isModal">
+        <h2>Category Management</h2>
+    </div>
+
+    <div class="forms-grid">
+        <!-- Create/Edit Main Category -->
+        <div class="card">
+            <h3>{{ isEditing ? 'Edit Category' : 'Add New Category' }}</h3>
+            <div class="form-group">
+                <label>Category Name</label>
+                <div class="input-group">
+                    <input type="text" [(ngModel)]="currentCategory.name" placeholder="e.g. Men, Women">
+                    <button *ngIf="isEditing" class="btn-cancel-edit" (click)="resetForm()">Cancel</button>
+                </div>
+            </div>
+            <button (click)="saveCategory()" [disabled]="!currentCategory.name || isLoading" class="btn-primary">
+                {{ isEditing ? 'Update Category' : 'Create Category' }}
+            </button>
+        </div>
+
+        <!-- Create Sub Category -->
+        <div class="card">
+            <h3>Add New Sub Category</h3>
+            <div class="form-group">
+                <label>Parent Category</label>
+                <select [(ngModel)]="selectedParentCategory">
+                    <option value="">Select Parent Category</option>
+                    <option *ngFor="let cat of categories" [value]="cat._id">{{cat.name}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sub Category Name</label>
+                <input type="text" [(ngModel)]="newSubCategoryName" placeholder="e.g. T-Shirts">
+            </div>
+            <button (click)="createSubCategory()"
+                [disabled]="!newSubCategoryName || !selectedParentCategory || isLoading" class="btn-primary">
+                Create Sub Category
+            </button>
+        </div>
+    </div>
+
+    <!-- Existing Categories List -->
+    <div class="list-section">
+        <h3>Existing Categories</h3>
+        <div class="categories-list">
+            <div class="category-item" *ngFor="let cat of categories">
+                <div class="cat-info">
+                    <strong>{{cat.name}}</strong>
+                    <span class="sub-count" *ngIf="cat.subCategories?.length">
+                        ({{cat.subCategories.length}} subs)
+                    </span>
+                </div>
+                <div class="actions">
+                    <button class="icon-btn" (click)="editCategory(cat)" title="Edit">
+                        ✏️
+                    </button>
+                    <button class="icon-btn delete" (click)="deleteCategory(cat._id)" title="Delete">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

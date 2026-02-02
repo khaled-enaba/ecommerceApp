@@ -1,0 +1,88 @@
+<div class="card" [class.out-of-stock]="product.stock === 0" role="article"
+    [attr.aria-label]="product.name + ' - $' + product.price">
+    <!-- Badges Section -->
+    <div class="badges-container" *ngIf="isBestSeller || isNewArrival">
+        <span class="badge best-seller" *ngIf="isBestSeller" aria-label="Best Seller">
+            <span class="badge-icon">🎖️</span>
+            Best Seller
+        </span>
+        <span class="badge new-arrival" *ngIf="isNewArrival" aria-label="New Arrival">
+            <span class="badge-icon">✨</span>
+            New
+        </span>
+    </div>
+
+    <!-- Image Container -->
+    <div class="image-container">
+        <a [routerLink]="['/products', product._id]" class="image-link"
+            [attr.aria-label]="'View details for ' + product.name">
+            <img [src]="getSafeImage(product.image)" [alt]="product.name" class="product-image" loading="lazy">
+        </a>
+
+        <!-- Stock Warning -->
+        <div class="stock-warning" *ngIf="product.stock > 0 && product.stock <= 3"
+            [ngClass]="'stock-' + getStockWarningClass()">
+            <span class="stock-label" [attr.aria-live]="'polite'">
+                {{ product.stock === 1 ? 'Only 1 left!' : 'Only ' + product.stock + ' left!' }}
+            </span>
+        </div>
+
+        <!-- Sold Out Overlay -->
+        <div class="sold-out-overlay" *ngIf="product.stock === 0" aria-label="Out of stock">
+            <span class="sold-out-text">Sold Out</span>
+        </div>
+    </div>
+
+    <!-- Card Content -->
+    <div class="card-content">
+        <!-- Category -->
+        <div class="category-tag" [title]="product.categoryId.name">
+            {{ product.categoryId.name }}
+        </div>
+
+        <!-- Product Title -->
+        <a [routerLink]="['/products', product._id]" class="product-title-link">
+            <h3 class="product-title">{{ product.name }}</h3>
+        </a>
+
+        <!-- Description -->
+        <p class="product-description">{{ product.description }}</p>
+
+        <!-- Price Section -->
+        <div class="price-section">
+            <span class="product-price" [attr.aria-label]="'Price: $' + product.price">
+                ${{ product.price }}
+            </span>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+            <!-- Quantity Spinner -->
+            <div class="quantity-spinner" *ngIf="product.stock > 0">
+                <button class="spinner-btn minus-btn" (click)="decrementQuantity()" [disabled]="quantity <= 1"
+                    aria-label="Decrease quantity" title="Decrease quantity">
+                    −
+                </button>
+                <span class="quantity-value" aria-label="Quantity selected">{{ quantity }}</span>
+                <button class="spinner-btn plus-btn" (click)="incrementQuantity()"
+                    [disabled]="quantity >= product.stock" aria-label="Increase quantity" title="Increase quantity">
+                    +
+                </button>
+            </div>
+
+            <!-- Add to Cart Button -->
+            <button class="add-to-cart-btn" (click)="onAddToCart()" [disabled]="product.stock === 0"
+                [attr.aria-label]="product.stock === 0 ? 'Out of stock' : 'Add ' + quantity + ' item(s) to cart'">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    aria-hidden="true">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                <span class="btn-text">
+                    {{ product.stock === 0 ? 'Sold Out' : 'Add to Cart' }}
+                </span>
+            </button>
+        </div>
+    </div>
+</div>

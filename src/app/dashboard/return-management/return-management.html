@@ -1,0 +1,99 @@
+<div class="orders-container">
+    <!-- Header -->
+    <div class="header">
+        <h1>Return Management</h1>
+        <p>Manage customer return requests</p>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading return requests...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading() && orders().length === 0" class="empty-state">
+        <p>No active return requests found</p>
+    </div>
+
+    <!-- Orders List -->
+    <div class="orders-list" *ngIf="!isLoading() && orders().length > 0">
+        <div class="order-card" *ngFor="let order of orders()">
+            <!-- Order Header -->
+            <div class="order-header">
+                <div class="order-info">
+                    <div class="order-number">Order #{{ order.orderNumber }}</div>
+                    <div class="order-date">{{ order.createdAt | date:'mediumDate' }}</div>
+                </div>
+
+                <div *ngIf="order.user" class="user-info">
+                    <span class="user-name">👤 {{ order.user.name }}</span>
+                    <span class="user-email">{{ order.user.email }}</span>
+                </div>
+
+                <div class="status-badge" [style.background-color]="getStatusColor(order.status)">
+                    {{ order.status | titlecase }}
+                </div>
+            </div>
+
+            <!-- Return Details Section -->
+            <div class="return-details-section"
+                style="background-color: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 8px;">
+                <h3 style="margin-top: 0; color: #e65100;">↩️ Return Request Details</h3>
+                <p><strong>Reason:</strong> {{ order.returnReason || 'No reason provided' }}</p>
+
+                <div *ngIf="order.returnAdminResponse">
+                    <p><strong>Admin Response:</strong> {{ order.returnAdminResponse }}</p>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-body">
+                <div class="items-section">
+                    <div class="items-title">Products:</div>
+                    <div class="items-list">
+                        <div class="item" *ngFor="let item of order.items">
+                            <div class="item-image" *ngIf="item.image">
+                                <img [src]="getImageUrl(item.image)" [alt]="item.name" />
+                            </div>
+                            <div class="item-info">
+                                <div class="item-name">{{ item.name }}</div>
+                                <div class="item-details">
+                                    <span>Qty: {{ item.quantity }}</span>
+                                    <span class="item-price">{{ item.price | currency }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Footer -->
+            <div class="order-footer" *ngIf="order.status === 'return-requested'">
+                <div class="actions-container" style="width: 100%;">
+
+                    <div *ngIf="selectedOrderId() === order._id" class="response-form" style="margin-bottom: 15px;">
+                        <label>Admin Response / Rejection Reason:</label>
+                        <textarea [(ngModel)]="adminResponse" rows="3" class="form-control"
+                            style="width: 100%; margin: 5px 0;" placeholder="Enter response to customer..."></textarea>
+                        <div class="form-actions" style="display: flex; gap: 10px; justify-content: flex-end;">
+                            <button (click)="cancelResponse()" class="btn btn-secondary">Cancel</button>
+                            <button (click)="rejectReturn(order._id)" class="btn btn-danger"
+                                [disabled]="isOperating(order._id)">Reject Return</button>
+                            <button (click)="approveReturn(order._id)" class="btn btn-success"
+                                [disabled]="isOperating(order._id)"
+                                style="background-color: #4caf50; color: white;">Approve Return</button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="selectedOrderId() !== order._id" class="initial-actions"
+                        style="display: flex; justify-content: flex-end;">
+                        <button (click)="selectOrderForResponse(order._id)" class="btn btn-primary">Process
+                            Return</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

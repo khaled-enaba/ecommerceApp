@@ -1,0 +1,447 @@
+<div class="profile-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage()" class="alert alert-success" role="alert">
+    {{ successMessage() }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage()" class="alert alert-error" role="alert">
+    {{ errorMessage() }}
+  </div>
+
+  <!-- Header -->
+  <div class="profile-header">
+    <h1>👤 My Profile</h1>
+    <p class="welcome-text" *ngIf="userData()">Welcome back, <strong>{{ userData()?.name }}</strong></p>
+  </div>
+
+  <!-- View Mode -->
+  <div class="card-container">
+    <div *ngIf="userData() && !isEditing()" class="profile-card">
+      <div class="profile-header-row">
+        <h2>Profile Information</h2>
+        <button (click)="toggleEditMode()" class="btn btn-primary">
+          ✏️ Edit Profile
+        </button>
+      </div>
+
+      <div class="profile-info">
+        <div class="info-row">
+          <label>Full Name</label>
+          <p class="value">{{ userData()?.name }}</p>
+        </div>
+
+        <div class="info-row">
+          <label>Email Address</label>
+          <p class="value">{{ userData()?.email }}</p>
+        </div>
+
+        <div class="info-row">
+          <label>Mobile Number</label>
+          <p class="value">{{ userData()?.mobile || 'Not provided' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Mode -->
+    <div *ngIf="isEditing()" class="profile-card">
+      <div class="profile-header-row">
+        <h2>Edit Profile</h2>
+      </div>
+
+      <form [formGroup]="profileForm" class="profile-form">
+        <!-- Name Field -->
+        <div class="form-group">
+          <label for="name">Full Name *</label>
+          <input id="name" type="text" formControlName="name" class="form-input" placeholder="Enter your full name">
+          <div *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched" class="error-text">
+            Name is required (minimum 2 characters)
+          </div>
+        </div>
+
+        <!-- Mobile Field -->
+        <div class="form-group">
+          <label for="mobile">Mobile Number *</label>
+          <input id="mobile" type="tel" formControlName="mobile" class="form-input"
+            placeholder="Enter 10+ digit phone number">
+          <div *ngIf="profileForm.get('mobile')?.invalid && profileForm.get('mobile')?.touched" class="error-text">
+            Mobile must be at least 10 digits
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" (click)="saveProfile()" [disabled]="profileForm.invalid || isLoading()"
+            class="btn btn-primary">
+            {{ isLoading() ? 'Saving...' : '💾 Save Changes' }}
+          </button>
+          <button type="button" (click)="cancelEdit()" class="btn btn-secondary">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Change Password Section (Only in Edit Mode) -->
+    <div *ngIf="isEditing()" class="profile-card password-change-section">
+      <div class="profile-header-row">
+        <h2>🔒 Change Password</h2>
+      </div>
+
+      <!-- Password Change Success/Error Messages -->
+      <div *ngIf="passwordChangeSuccess()" class="alert alert-success" role="alert">
+        {{ passwordChangeSuccess() }}
+      </div>
+
+      <div *ngIf="passwordChangeError()" class="alert alert-error" role="alert">
+        {{ passwordChangeError() }}
+      </div>
+
+      <form [formGroup]="changePasswordForm" class="profile-form">
+        <!-- Current Password Field -->
+        <div class="form-group">
+          <label for="currentPassword">Current Password *</label>
+          <div class="password-input-wrapper">
+            <input id="currentPassword" [type]="showCurrentPassword() ? 'text' : 'password'"
+              formControlName="currentPassword" class="form-input" placeholder="Enter your current password">
+            <button type="button" class="password-toggle-btn" (click)="toggleCurrentPasswordVisibility()"
+              [attr.aria-label]="showCurrentPassword() ? 'Hide password' : 'Show password'">
+              <span *ngIf="showCurrentPassword()" class="eye-icon">👁️</span>
+              <span *ngIf="!showCurrentPassword()" class="eye-icon">👁️‍🗨️</span>
+            </button>
+          </div>
+          <div
+            *ngIf="changePasswordForm.get('currentPassword')?.invalid && changePasswordForm.get('currentPassword')?.touched"
+            class="error-text">
+            Current password is required (minimum 6 characters)
+          </div>
+        </div>
+
+        <!-- New Password Field -->
+        <div class="form-group">
+          <label for="newPassword">New Password *</label>
+          <div class="password-input-wrapper">
+            <input id="newPassword" [type]="showNewPassword() ? 'text' : 'password'" formControlName="password"
+              class="form-input" placeholder="Enter your new password">
+            <button type="button" class="password-toggle-btn" (click)="toggleNewPasswordVisibility()"
+              [attr.aria-label]="showNewPassword() ? 'Hide password' : 'Show password'">
+              <span *ngIf="showNewPassword()" class="eye-icon">👁️</span>
+              <span *ngIf="!showNewPassword()" class="eye-icon">👁️‍🗨️</span>
+            </button>
+          </div>
+          <div *ngIf="changePasswordForm.get('password')?.invalid && changePasswordForm.get('password')?.touched"
+            class="error-text">
+            New password is required (minimum 6 characters)
+          </div>
+        </div>
+
+        <!-- Confirm New Password Field -->
+        <div class="form-group">
+          <label for="confirmNewPassword">Confirm New Password *</label>
+          <div class="password-input-wrapper">
+            <input id="confirmNewPassword" [type]="showConfirmNewPassword() ? 'text' : 'password'"
+              formControlName="passwordConfirm" class="form-input" placeholder="Confirm your new password">
+            <button type="button" class="password-toggle-btn" (click)="toggleConfirmNewPasswordVisibility()"
+              [attr.aria-label]="showConfirmNewPassword() ? 'Hide password' : 'Show password'">
+              <span *ngIf="showConfirmNewPassword()" class="eye-icon">👁️</span>
+              <span *ngIf="!showConfirmNewPassword()" class="eye-icon">👁️‍🗨️</span>
+            </button>
+          </div>
+          <div
+            *ngIf="changePasswordForm.get('passwordConfirm')?.invalid && changePasswordForm.get('passwordConfirm')?.touched"
+            class="error-text">
+            Please confirm your new password
+          </div>
+        </div>
+
+        <!-- Password Mismatch Error -->
+        <div
+          *ngIf="changePasswordForm.hasError('passwordMismatch') && changePasswordForm.get('password')?.value && changePasswordForm.get('passwordConfirm')?.value"
+          class="error-text">
+          ⚠️ Passwords do not match
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button type="button" (click)="changePassword()"
+            [disabled]="changePasswordForm.invalid || isChangingPassword()" class="btn btn-primary">
+            {{ isChangingPassword() ? 'Updating...' : '🔐 Update Password' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Addresses Section -->
+    <div class="profile-card" *ngIf="userData()">
+      <!-- Addresses Error/Success Messages -->
+      <div *ngIf="addressesSuccessMessage()" class="alert alert-success" role="alert">
+        {{ addressesSuccessMessage() }}
+      </div>
+
+      <div *ngIf="addressesErrorMessage()" class="alert alert-error" role="alert">
+        {{ addressesErrorMessage() }}
+      </div>
+
+      <!-- Addresses Header -->
+      <div class="profile-header-row">
+        <h2>📍 My Addresses</h2>
+        <button (click)="toggleEditAddresses()" class="btn btn-primary">
+          {{ isEditingAddresses() ? 'Done' : '✏️ Edit Addresses' }}
+        </button>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoadingAddresses()" class="loading-text">
+        Loading addresses...
+      </div>
+
+      <!-- Addresses View Mode -->
+      <div *ngIf="!isLoadingAddresses() && !isEditingAddresses()">
+        <!-- Default Address -->
+        <div *ngIf="getDefaultAddress() as defaultAddr" class="address-section">
+          <h3 class="address-subtitle">Default Address</h3>
+          <div class="address-card default-address">
+            <div class="address-badge">DEFAULT</div>
+            <div class="address-content">
+              <p class="address-type"><strong>📌 {{ defaultAddr.type | titlecase }}</strong></p>
+              <p class="address-line">{{ defaultAddr.addressLine }}</p>
+              <p class="address-city">{{ defaultAddr.city }}</p>
+              <p class="address-phone" *ngIf="defaultAddr.phone">📱 {{ defaultAddr.phone }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Addresses -->
+        <div *ngIf="getOtherAddresses().length > 0" class="address-section">
+          <h3 class="address-subtitle">Other Addresses</h3>
+          <div *ngFor="let addr of getOtherAddresses()" class="address-card">
+            <div class="address-content">
+              <p class="address-type"><strong>{{ addr.type | titlecase }}</strong></p>
+              <p class="address-line">{{ addr.addressLine }}</p>
+              <p class="address-city">{{ addr.city }}</p>
+              <p class="address-phone" *ngIf="addr.phone">📱 {{ addr.phone }}</p>
+            </div>
+            <div class="address-actions">
+              <button (click)="setDefaultAddress(addr._id!)" class="btn btn-sm btn-outline"
+                [disabled]="isLoadingAddresses()">
+                Set Default
+              </button>
+              <button (click)="deleteAddress(addr._id!)" class="btn btn-sm btn-danger"
+                [disabled]="isLoadingAddresses()">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Addresses -->
+        <div *ngIf="addresses().length === 0" class="empty-state">
+          <p>No addresses added yet. Click "Edit Addresses" to add one.</p>
+        </div>
+      </div>
+
+      <!-- Addresses Edit Mode -->
+      <div *ngIf="!isLoadingAddresses() && isEditingAddresses()" class="addresses-edit-mode">
+        <p class="edit-mode-text">
+          Address management coming soon. You can add, edit, or delete addresses here.
+        </p>
+      </div>
+    </div>
+  </div>
+  <!-- Last Order Section -->
+  <div class="profile-card" *ngIf="userData()">
+    <!-- Order Success/Error Messages -->
+    <div *ngIf="orderSuccessMessage()" class="alert alert-success" role="alert">
+      {{ orderSuccessMessage() }}
+    </div>
+
+    <div *ngIf="orderErrorMessage()" class="alert alert-error" role="alert">
+      {{ orderErrorMessage() }}
+    </div>
+
+    <!-- Order Header -->
+    <div class="profile-header-row">
+      <h2>📦 Last Order</h2>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoadingOrder()" class="loading-text">
+      Loading order information...
+    </div>
+
+    <!-- Last Order View -->
+    <div *ngIf="!isLoadingOrder() && lastOrder() as order">
+      <div class="order-card">
+        <!-- Order Header Info -->
+        <div class="order-header">
+          <div class="order-info-group">
+            <div class="order-info-item">
+              <span class="label">Order Number</span>
+              <p class="value">{{ order.orderNumber }}</p>
+            </div>
+            <div class="order-info-item">
+              <span class="label">Order Date</span>
+              <p class="value">{{ order.createdAt | date: 'medium' }}</p>
+            </div>
+            <div class="order-info-item">
+              <span class="label">Status</span>
+              <p class="value order-status" [style.color]="getOrderStatusColor(order.status)">
+                <strong>{{ order.status | titlecase }}</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-items-section">
+          <h3 class="order-subtitle">Items</h3>
+          <div class="order-items-list">
+            <div *ngFor="let item of order.items" class="order-item">
+              <div class="item-info">
+                <img *ngIf="item.image" [src]="getImageUrl(item.image)" [alt]="item.name" class="item-image">
+                <div class="item-details">
+                  <p class="item-name">{{ item.name }}</p>
+                  <p class="item-quantity">Qty: {{ item.quantity }}</p>
+                </div>
+              </div>
+              <div class="item-price">
+                <p>{{ item.price | currency }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <div class="summary-row">
+            <span>Total Amount:</span>
+            <strong class="total-amount">{{ order.totalAmount | currency }}</strong>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="order-address-section">
+          <h3 class="order-subtitle">Shipping Address</h3>
+          <div class="address-info">
+            <p>{{ order.shippingAddress.addressLine }}</p>
+            <p>{{ order.shippingAddress.city }}</p>
+            <p>📱 {{ order.shippingAddress.phone }}</p>
+          </div>
+        </div>
+
+        <!-- Cancel/Return Order Button -->
+        <div class="order-actions">
+          <!-- Cancel Button (Pending) -->
+          <button *ngIf="order.status === 'pending'" (click)="cancelLastOrder()" [disabled]="isCancellingOrder()"
+            class="btn btn-danger">
+            {{ isCancellingOrder() ? 'Cancelling...' : '❌ Cancel Order' }}
+          </button>
+
+          <!-- Return Button (Received) -->
+          <button *ngIf="canReturnOrder(order.status)" (click)="returnLastOrder()" [disabled]="isReturningOrder()"
+            class="btn btn-warning" style="background-color: #ff9800; color: white; border: none;">
+            {{ isReturningOrder() ? 'Processing...' : '🔙 Return Order' }}
+          </button>
+
+          <!-- Cannot Cancel/Return Message -->
+          <button *ngIf="order.status !== 'pending' && !canReturnOrder(order.status)" disabled class="btn btn-secondary"
+            [title]="'Cannot modify ' + order.status + ' orders'">
+            ❌ Cannot Modify ({{ order.status | titlecase }})
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Order -->
+    <div *ngIf="!isLoadingOrder() && !lastOrder()" class="empty-state">
+      <p>No orders found. Start shopping now!</p>
+    </div>
+  </div>
+
+  <!-- Orders History Section -->
+  <div class="history-card" *ngIf="userData()">
+    <!-- History Header -->
+    <div class="profile-header-row">
+      <h2>📜 Orders History</h2>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoadingHistory()" class="loading-text">
+      Loading orders history...
+    </div>
+    <div *ngIf="!isLoadingHistory() && allOrders().length === 0" class="empty-state">
+      <p>No orders found. Start shopping now!</p>
+    </div>
+    <div *ngIf="!isLoadingHistory() && allOrders().length > 0" class="orders-history-list">
+      <div *ngFor="let order of allOrders()" class="history-order-card">
+        <!-- Order Header -->
+        <div class="history-order-header">
+          <div class="history-order-info">
+            <div class="order-number-badge">
+              {{ order.orderNumber }}
+            </div>
+            <div class="order-date">
+              {{ order.createdAt | date: 'short' }}
+            </div>
+          </div>
+          <div class="order-status-badge" [style.background-color]="getOrderStatusColor(order.status)">
+            {{ getOrderStatusIcon(order.status) }} {{ order.status | titlecase }}
+          </div>
+        </div>
+
+        <!-- Admin Response (Visible for Returned/Rejected) -->
+        <div *ngIf="order.returnAdminResponse" class="admin-response-box"
+          style="background-color: #f8f9fa; border-left: 4px solid #dc3545; padding: 10px; margin: 10px 15px; border-radius: 4px;">
+          <strong style="color: #dc3545;">📢 Admin Response:</strong>
+          <p style="margin: 5px 0 0 0; color: #333;">{{ order.returnAdminResponse }}</p>
+        </div>
+
+        <!-- Order Items Preview -->
+        <div class="history-order-items">
+          <div *ngFor="let item of order.items" class="history-item">
+            <span class="item-info">{{ item.name }} x{{ item.quantity }}</span>
+            <span class="item-total">{{ item.price * item.quantity | currency }}</span>
+          </div>
+        </div>
+
+        <!-- Order Footer -->
+        <div class="history-order-footer">
+          <div class="order-total">
+            <strong>Total: {{ order.totalAmount | currency }}</strong>
+          </div>
+
+          <!-- Actions -->
+          <div class="history-order-actions">
+            <!-- Cancel -->
+            <button *ngIf="order.status === 'pending'" (click)="cancelOrderFromHistory(order._id)"
+              [disabled]="isLoadingHistory()" class="btn btn-sm btn-danger" title="Cancel this order">
+              ❌ Cancel
+            </button>
+
+            <!-- Return -->
+            <button *ngIf="canReturnOrder(order.status)" (click)="returnOrderFromHistory(order._id)"
+              [disabled]="isLoadingHistory()" class="btn btn-sm btn-warning"
+              style="background-color: #ff9800; color: white; border: none; margin-left: 8px;"
+              title="Return this order">
+              🔙 Return
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoadingHistory() && allOrders().length === 0" class="empty-state">
+      <p>No orders found. Start shopping now!</p>
+    </div>
+  </div>
+
+  <!-- Orders History List -->
+
+
+</div>

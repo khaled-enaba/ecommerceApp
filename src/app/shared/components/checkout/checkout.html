@@ -1,0 +1,107 @@
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1>Checkout</h1>
+        <p>Complete your purchase securely.</p>
+    </div>
+
+    <div class="checkout-layout">
+        <div class="form-section">
+            <h2>Shipping Information</h2>
+
+            <!-- Loading State -->
+            <div *ngIf="isLoadingAddresses()" class="loading-text">
+                Loading addresses...
+            </div>
+
+            <!-- Address Selection -->
+            <div *ngIf="!isLoadingAddresses()" class="address-selection">
+                <!-- Dropdown for saved addresses -->
+                <div class="form-group" *ngIf="savedAddresses().length > 0 && addressMode() === 'select'">
+                    <label for="addressSelect">Select Saved Address</label>
+                    <select id="addressSelect" [value]="selectedAddressId()"
+                        (change)="selectAddress($any($event.target).value)" class="form-select">
+                        <option *ngFor="let addr of savedAddresses()" [value]="addr._id">
+                            {{ addr.type | titlecase }} - {{ addr.addressLine }}, {{ addr.city }}
+                            <span *ngIf="addr.isDefault">(Default)</span>
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Button to add new address -->
+                <div class="form-group" *ngIf="addressMode() === 'select'">
+                    <button type="button" (click)="switchToNewAddress()" class="btn-add-new">
+                        ➕ Add New Address
+                    </button>
+                </div>
+
+                <!-- Back to selection button -->
+                <div class="form-group" *ngIf="addressMode() === 'new' && savedAddresses().length > 0">
+                    <button type="button" (click)="addressMode.set('select'); loadSavedAddresses()"
+                        class="btn-secondary">
+                        ⬅️ Back to Saved Addresses
+                    </button>
+                </div>
+            </div>
+
+            <!-- Shipping Address Form -->
+            <form (ngSubmit)="placeOrder()" class="checkout-form">
+                <div class="form-group">
+                    <label for="type">Address Type</label>
+                    <select id="type" [(ngModel)]="shippingAddress.type" name="type" (change)="onAddressFieldChange()"
+                        class="form-select">
+                        <option value="home">Home</option>
+                        <option value="office">Office</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address Line *</label>
+                    <input type="text" id="address" [(ngModel)]="shippingAddress.addressLine" name="address"
+                        (input)="onAddressFieldChange()" placeholder="123 Fashion Street, Apt 4B" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="city">City *</label>
+                        <input type="text" id="city" [(ngModel)]="shippingAddress.city" name="city"
+                            (input)="onAddressFieldChange()" placeholder="New York" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number *</label>
+                    <input type="tel" id="phone" [(ngModel)]="shippingAddress.phone" name="phone"
+                        (input)="onAddressFieldChange()" placeholder="+1 234 567 8900" required>
+                </div>
+
+                <!-- Save Changes Button (only for modified saved addresses) -->
+                <div class="form-group" *ngIf="isAddressModified() && addressMode() === 'select'">
+                    <button type="button" (click)="saveAddressChanges()" class="btn-save-changes">
+                        💾 Save Changes to Address
+                    </button>
+                    <p class="info-text">
+                        ℹ️ Changes are temporary for this order. Click "Save Changes" to update permanently.
+                    </p>
+                </div>
+
+                <button type="submit" class="submit-btn shadow-vibrant" [disabled]="isSubmitting">
+                    {{ isSubmitting ? 'Processing...' : 'Place Order' }}
+                </button>
+            </form>
+        </div>
+
+        <div class="order-summary">
+            <h2>Order Summary</h2>
+            <div class="summary-items">
+                <div class="summary-item" *ngFor="let item of cartService.items()">
+                    <span>{{ item.quantity }}x {{ item.product?.name }}</span>
+                    <span>{{ (item.product?.price || 0) * item.quantity | currency }}</span>
+                </div>
+            </div>
+            <div class="total-row">
+                <span>Total</span>
+                <span class="total-amount">{{ total | currency }}</span>
+            </div>
+        </div>
+    </div>
+</div>

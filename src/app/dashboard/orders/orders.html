@@ -1,0 +1,110 @@
+<div class="orders-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>{{ isAdmin() ? 'Orders Management' : 'My Orders' }}</h1>
+    <p>{{ isAdmin() ? 'View and manage all customer orders' : 'Track and manage your orders' }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading orders...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading() && orders().length === 0" class="empty-state">
+    <p>No orders found</p>
+    <a routerLink="/home" class="link">Continue Shopping</a>
+  </div>
+
+  <!-- Orders List -->
+  <div class="orders-list" *ngIf="!isLoading() && orders().length > 0">
+    <div class="order-card" *ngFor="let order of orders()">
+      <!-- Order Header -->
+      <div class="order-header">
+        <div class="order-info">
+          <div class="order-number">Order #{{ order.orderNumber }}</div>
+          <div class="order-date">{{ order.createdAt | date:'mediumDate' }}</div>
+        </div>
+        
+        <!-- User Info (Admin Only) -->
+        <div *ngIf="isAdmin() && order.user" class="user-info">
+          <span class="user-name">👤 {{ order.user.name }}</span>
+          <span class="user-email">{{ order.user.email }}</span>
+        </div>
+
+        <!-- Status Badge -->
+        <div class="status-badge" [ngClass]="'status-' + order.status">
+          {{ getStatusText(order.status) }}
+        </div>
+      </div>
+
+      <!-- Order Items Section -->
+      <div class="order-body">
+        <div class="items-section">
+          <div class="items-title">Products:</div>
+          
+          <div class="items-list">
+            <div class="item" *ngFor="let item of order.items">
+              <div class="item-image" *ngIf="item.image">
+                <img [src]="getImageUrl(item.image)" [alt]="item.name" />
+              </div>
+              <div class="item-info">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-details">
+                  <span>Qty: {{ item.quantity }}</span>
+                  <span class="item-price">{{ item.price | currency }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Address Section -->
+        <div class="address-section" *ngIf="order.shippingAddress">
+          <div class="address-title">Shipping Address:</div>
+          <div class="address-details">
+            <p>{{ order.shippingAddress.addressLine }}</p>
+            <p>{{ order.shippingAddress.city }}</p>
+            <p>☎️ {{ order.shippingAddress.phone }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Footer -->
+      <div class="order-footer">
+        <!-- Total Amount -->
+        <div class="total-section">
+          <span class="total-label">Total:</span>
+          <span class="total-amount">{{ order.totalAmount | currency }}</span>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+          <!-- Cancel Button (Both User & Admin) -->
+          <button 
+            *ngIf="order.status !== 'cancelled' && order.status !== 'received'"
+            (click)="cancelOrder(order._id)"
+            [disabled]="isOperating(order._id)"
+            class="btn btn-cancel">
+            {{ isOperating(order._id) ? '⏳ Cancelling...' : '❌ Cancel' }}
+          </button>
+
+          <!-- Complete Button (Admin only - from pending, preparing, shipped) -->
+          <button 
+            *ngIf="isAdmin() && (order.status === 'pending' || order.status === 'preparing' || order.status === 'shipped')"
+            (click)="markAsReceived(order._id)"
+            [disabled]="isOperating(order._id)"
+            class="btn btn-received">
+            {{ isOperating(order._id) ? '⏳ Confirming...' : '✅ Complete' }}
+          </button>
+
+          <!-- Status Label (if can't do actions) -->
+          <span *ngIf="order.status === 'cancelled' || order.status === 'received'" class="status-label">
+            {{ order.status === 'cancelled' ? 'Cancelled' : 'Received' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

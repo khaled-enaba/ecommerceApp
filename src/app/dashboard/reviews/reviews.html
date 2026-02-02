@@ -1,0 +1,85 @@
+<div class="reviews-container">
+    <div class="header">
+        <h1>Review Moderation</h1>
+        <p>Analyze and approve "Customer Messages" before they go live.</p>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">Messages Pending</span>
+            <span class="stat-value highlight">{{ pendingCount }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Total in Database</span>
+            <span class="stat-value">{{ reviews.length }}</span>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs-nav">
+        <button [class.active]="currentTab === 'pending'" (click)="setTab('pending')">
+            Inbox
+            <span class="badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+        </button>
+        <button [class.active]="currentTab === 'all'" (click)="setTab('all')">Global History</button>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-card">
+        <div *ngIf="isLoading" class="loading">Fetching data...</div>
+
+        <table *ngIf="!isLoading && filteredReviews.length > 0">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>Rating</th>
+                    <th>Message Content</th>
+                    <th>State</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let review of filteredReviews">
+                    <td>
+                        <div class="user-cell">
+                            <strong>{{ review.userId?.name || 'Anonymous' }}</strong>
+                            <span>{{ review.userId?.email || 'No email' }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="rating">
+                            {{ '★'.repeat(review.rating) }}{{ '☆'.repeat(5 - review.rating) }}
+                        </span>
+                    </td>
+                    <td>
+                        <p class="comment-text" [title]="review.comment">"{{ review.comment }}"</p>
+                    </td>
+                    <td>
+                        <span class="status-badge" [class.approved]="review.isApproved">
+                            {{ review.isApproved ? 'LIVE' : 'PENDING' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button *ngIf="!review.isApproved" (click)="approveReview(review._id)" class="btn-approve"
+                                title="Post to homepage">
+                                🆗 Approve
+                            </button>
+                            <button (click)="deleteReview(review._id)" class="btn-delete" title="Remove forever">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- No data states -->
+        <div *ngIf="!isLoading && filteredReviews.length === 0" class="empty-state">
+            <div class="empty-icon">�</div>
+            <p *ngIf="currentTab === 'pending'">Your inbox is empty. No messages need approval.</p>
+            <p *ngIf="currentTab === 'all'">The review history is empty.</p>
+        </div>
+    </div>
+</div>

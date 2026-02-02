@@ -1,0 +1,257 @@
+<div class="products-dashboard">
+    <!-- Header Section -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <h1>Product Catalog</h1>
+            <p>Manage your entire product inventory with ease</p>
+        </div>
+        <button class="btn-secondary" (click)="openCategoryModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+            Manage Categories
+        </button>
+        <button class="btn-add-product" (click)="openAddModal()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 5v14m-7-7h14"></path>
+            </svg>
+            Add Product
+        </button>
+    </header>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="search-box">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input type="text" [ngModel]="filterQuery()" (ngModelChange)="filterQuery.set($event)"
+                placeholder="Search products by name or description...">
+        </div>
+
+        <div class="filter-group">
+            <label>Category</label>
+            <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event)">
+                <option value="">All Categories</option>
+                <option *ngFor="let cat of categories()" [value]="cat._id">{{ cat.name }}</option>
+            </select>
+        </div>
+
+        <div class="stats-badge">
+            <span class="stats-number">{{ filteredProducts().length }}</span>
+            <span class="stats-label">Products</span>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!isLoading()" class="products-grid">
+        <div *ngFor="let product of filteredProducts()" class="product-card">
+            <div class="product-image-container">
+                <img [src]="getProductImage(product.image)" [alt]="product.name" class="product-image">
+                <div class="stock-badge" [class]="'stock-' + getStockStatus(product.stock)">
+                    {{ getStockStatus(product.stock) === 'out' ? 'Out of Stock' :
+                    getStockStatus(product.stock) === 'low' ? 'Low Stock' : 'In Stock' }}
+                </div>
+            </div>
+
+            <div class="product-info">
+                <div class="product-header">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <span class="product-price">{{ formatPrice(product.price) }}</span>
+                </div>
+
+                <p class="product-description">{{ product.description }}</p>
+
+                <div class="product-meta">
+                    <span class="meta-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        {{ product.categoryId.name || 'Uncategorized' }}
+                    </span>
+                    <span class="meta-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 7h-9M14 17H5M17 3v18M10 7v14"></path>
+                        </svg>
+                        Stock: {{ product.stock }}
+                    </span>
+                    <span class="meta-item">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Sold: {{ product.soldCount || 0 }}
+                    </span>
+                </div>
+
+                <div class="product-actions">
+                    <button class="btn-edit" (click)="openEditModal(product)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit
+                    </button>
+                    <button class="btn-delete" (click)="deleteProduct(product._id, product.name)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredProducts().length === 0" class="empty-state">
+            <svg class="empty-icon" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <h3>No products found</h3>
+            <p>{{ filterQuery() || selectedCategory() ? 'Try adjusting your filters' : 'Get started by adding your first
+                product' }}</p>
+        </div>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div *ngIf="showModal()" class="modal-overlay" (click)="closeModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>{{ isEditing() ? 'Edit Product' : 'Add New Product' }}</h2>
+                <button class="close-btn" (click)="closeModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form (ngSubmit)="saveProduct()" class="modal-body">
+                <!-- Product Images -->
+                <div class="form-group">
+                    <label>Product Images</label>
+                    <div class="image-upload-zone">
+                        <input type="file" id="product-images" accept="image/*" multiple
+                            (change)="onImageSelect($event)" hidden>
+                        <label for="product-images" class="upload-label">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span>Click to upload images</span>
+                            <span class="upload-hint">PNG, JPG up to 5MB each</span>
+                        </label>
+                    </div>
+
+                    <!-- Image Previews -->
+                    <div *ngIf="imagePreview().length > 0" class="image-previews">
+                        <div *ngFor="let preview of imagePreview()" class="image-preview">
+                            <img [src]="preview" alt="Preview">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Name -->
+                <div class="form-group">
+                    <label>Product Name *</label>
+                    <input type="text" [(ngModel)]="currentProduct().name" name="name" placeholder="Enter product name"
+                        required>
+                </div>
+
+                <!-- Product Description -->
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea [(ngModel)]="currentProduct().description" name="description"
+                        placeholder="Enter product description" rows="4"></textarea>
+                </div>
+
+                <!-- Price and Stock -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (USD) *</label>
+                        <input type="number" [(ngModel)]="currentProduct().price" name="price" placeholder="0.00"
+                            min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Stock Quantity *</label>
+                        <input type="number" [(ngModel)]="currentProduct().stock" name="stock" placeholder="0" min="0"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Category and Subcategory -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select [ngModel]="currentProduct().categoryId?._id || currentProduct().categoryId"
+                            (ngModelChange)="onCategoryChange($event)" name="categoryId">
+                            <option value="">Select Category</option>
+                            <option *ngFor="let cat of categories()" [value]="cat._id">{{ cat.name }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subcategory</label>
+                        <select [(ngModel)]="currentProduct().subCategoryId" name="subCategoryId"
+                            [disabled]="subCategories().length === 0">
+                            <option value="">Select Subcategory</option>
+                            <option *ngFor="let sub of subCategories()" [value]="sub._id">{{ sub.name }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-submit">
+                        {{ isEditing() ? 'Update Product' : 'Create Product' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Category Management Modal -->
+    <div *ngIf="showCategoryModal()" class="modal-overlay" (click)="closeCategoryModal()">
+        <div class="modal modal-sm" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Manage Categories</h2>
+                <button class="close-btn" (click)="closeCategoryModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body category-modal-body">
+                <app-categories [isModal]="true" (close)="closeCategoryModal()" (categoryChanged)="onCategoryChanged()">
+                </app-categories>
+            </div>
+        </div>
+    </div>
+</div>

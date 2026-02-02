@@ -1,0 +1,205 @@
+<!-- Main Product Listing Page -->
+<main class="products-page" role="main">
+  <!-- Success Message -->
+  <div class="success-message" *ngIf="successMessage" role="alert" aria-live="polite">
+    <span>✓ {{ successMessage }}</span>
+    <button class="close-btn" (click)="successMessage = null" aria-label="Close message">×</button>
+  </div>
+
+  <!-- Filters Section -->
+  <section class="filters-section" aria-labelledby="filters-title">
+    <div class="container">
+      <h2 id="filters-title" class="filters-title">Find Your Perfect Item</h2>
+
+      <!-- Integrated Search Bar -->
+      <div class="search-bar-wrapper">
+        <app-search-bar [autoFocus]="false" placeholder="Search products..."
+          (searchChange)="onSearch($event)"></app-search-bar>
+      </div>
+
+      <form class="filters-container" (ngSubmit)="false">
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+          <label for="category-select" class="filter-label">Category</label>
+          <select id="category-select" class="filter-select" #categorySelect
+            (change)="onCategoryChange(categorySelect.value)" aria-label="Filter by category">
+            <option value="">All Categories</option>
+            <option *ngFor="let cat of categories" [value]="cat._id">
+              {{ cat.name }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Best Sellers Toggle -->
+        <div class="filter-group toggle-group">
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox-input" [checked]="filters.bestSellersOnly"
+              (change)="toggleBestSellers()" aria-label="Filter by best sellers">
+            <span class="checkbox-text">🎖️ Best Sellers</span>
+          </label>
+        </div>
+
+        <!-- New Arrivals Toggle -->
+        <div class="filter-group toggle-group">
+          <label class="checkbox-label">
+            <input type="checkbox" class="checkbox-input" [checked]="filters.newArrivalsOnly"
+              (change)="toggleNewArrivals()" aria-label="Filter by new arrivals">
+            <span class="checkbox-text">✨ New Arrivals</span>
+          </label>
+        </div>
+
+        <!-- Clear All Filters -->
+        <button type="button" class="clear-filters-btn" (click)="clearAllFilters()"
+          [disabled]="!filters.searchTerm && !filters.categoryId && !filters.bestSellersOnly && !filters.newArrivalsOnly && filters.sortBy === 'newest'"
+          aria-label="Clear all filters">
+          Clear All
+        </button>
+      </form>
+
+      <!-- Results Count -->
+      <div class="results-info" role="status" aria-live="polite">
+        <span class="results-count">
+          Showing
+          <strong>{{ (productListService.paginatedProducts$() | slice:0).length || 0 }}</strong>
+          of <strong>{{ pagination.totalItems }}</strong> products
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Products Grid Section -->
+  <section class="products-section" aria-labelledby="products-title">
+    <div class="container">
+      <h2 id="products-title" class="sr-only">Product Results</h2>
+
+      <!-- Loading State -->
+      <div *ngIf="productListService.isLoading$()" class="loading-state" role="status" aria-live="polite">
+        <div class="spinner"></div>
+        <p>Loading products...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="productListService.error$()" class="error-state" role="alert">
+        <span>⚠️ {{ productListService.error$() }}</span>
+        <button type="button" class="retry-btn" (click)="productListService.loadProducts()"
+          aria-label="Retry loading products">
+          Retry
+        </button>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!productListService.isLoading$() && pagination.totalItems === 0" class="empty-state" role="status">
+        <div class="empty-icon">🔍</div>
+        <h3>No Products Found</h3>
+        <p>Try adjusting your filters or search terms</p>
+        <button type="button" class="clear-filters-btn" (click)="clearAllFilters()">
+          Clear All Filters
+        </button>
+      </div>
+
+      <!-- Products Grid -->
+      <div *ngIf="!productListService.isLoading$() && pagination.totalItems > 0" class="products-grid">
+        <div *ngFor="let product of productListService.paginatedProducts$()" class="product-item">
+          <app-product-card [product]="product" (addToCart)="onAddToCart($event)"></app-product-card>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pagination Section -->
+  <section *ngIf="!productListService.isLoading$() && pagination.totalItems > 0 && pagination.totalPages > 1"
+    class="pagination-section" aria-labelledby="pagination-title">
+    <div class="container">
+      <h2 id="pagination-title" class="sr-only">Pagination</h2>
+
+      <nav class="pagination" role="navigation" aria-label="Product pagination">
+        <!-- Previous Button -->
+        <button type="button" class="pagination-btn prev-btn" (click)="previousPage()"
+          [disabled]="pagination.currentPage === 1" aria-label="Previous page"
+          [attr.aria-disabled]="pagination.currentPage === 1">
+          ← Previous
+        </button>
+
+        <!-- Page Numbers -->
+        <div class="page-numbers">
+          <!-- First Page -->
+          <button *ngIf="pageNumbers[0] > 1" type="button" class="page-btn" (click)="goToPage(1)"
+            [attr.aria-label]="'Go to page 1'" [class.active]="pagination.currentPage === 1">
+            1
+          </button>
+
+          <!-- Ellipsis Start -->
+          <span *ngIf="pageNumbers[0] > 2" class="ellipsis" aria-hidden="true">...</span>
+
+          <!-- Page Buttons -->
+          <button *ngFor="let pageNum of pageNumbers" type="button" class="page-btn" (click)="goToPage(pageNum)"
+            [class.active]="pagination.currentPage === pageNum" [attr.aria-label]="'Go to page ' + pageNum"
+            [attr.aria-current]="pagination.currentPage === pageNum ? 'page' : false">
+            {{ pageNum }}
+          </button>
+
+          <!-- Ellipsis End -->
+          <span *ngIf="pageNumbers[pageNumbers.length - 1] < pagination.totalPages - 1" class="ellipsis"
+            aria-hidden="true">...</span>
+
+          <!-- Last Page -->
+          <button *ngIf="pageNumbers[pageNumbers.length - 1] < pagination.totalPages" type="button" class="page-btn"
+            (click)="goToPage(pagination.totalPages)" [attr.aria-label]="'Go to page ' + pagination.totalPages"
+            [class.active]="pagination.currentPage === pagination.totalPages">
+            {{ pagination.totalPages }}
+          </button>
+        </div>
+
+        <!-- Next Button -->
+        <button type="button" class="pagination-btn next-btn" (click)="nextPage()"
+          [disabled]="pagination.currentPage === pagination.totalPages" aria-label="Next page"
+          [attr.aria-disabled]="pagination.currentPage === pagination.totalPages">
+          Next →
+        </button>
+      </nav>
+
+      <!-- Page Info -->
+      <div class="page-info" role="status">
+        Page <strong>{{ pagination.currentPage }}</strong> of <strong>{{ pagination.totalPages }}</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- Customer Reviews Section -->
+  <section class="section reviews-section">
+    <h2>Customer Reviews</h2>
+    <div class="reviews-grid">
+      <div class="review-card" *ngFor="let review of reviews">
+        <div class="review-header">
+          <strong>{{ review.userId.name }}</strong>
+          <span class="rating">★ {{ review.rating }}</span>
+        </div>
+        <p>{{ review.comment }}</p>
+      </div>
+      <p *ngIf="reviews.length === 0">No reviews yet.</p>
+    </div>
+
+    <div class="add-review">
+      <h3>Write a Review</h3>
+      <div *ngIf="isLoggedIn; else loginToReview">
+        <form (ngSubmit)="submitReview()">
+          <select [(ngModel)]="newReview.rating" name="rating">
+            <option value="5">5 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="2">2 Stars</option>
+            <option value="1">1 Star</option>
+          </select>
+          <textarea [(ngModel)]="newReview.comment" name="comment" placeholder="Share your experience..."
+            required></textarea>
+          <button type="submit">Submit Review</button>
+        </form>
+      </div>
+      <ng-template #loginToReview>
+        <p><a routerLink="/login">Login</a> to write a review.</p>
+      </ng-template>
+    </div>
+  </section>
+
+</main>

@@ -1,0 +1,17 @@
+<section class="arrival-section">
+  <div class="section-header">
+    <div class="title-wrap">
+      <span class="subtitle">Curated Excellence</span>
+      <h2 class="section-title">{{ title }}</h2>
+    </div>
+    <a [routerLink]="['/products']" [queryParams]="{category: categoryId || null}" class="view-all">
+      Discovery Collection <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <div class="products-grid">
+    <app-product-card *ngFor="let product of bestSellers()" [product]="product" (addToCart)="handleAddToCart($event)"
+      class="reveal-item">
+    </app-product-card>
+  </div>
+</section>

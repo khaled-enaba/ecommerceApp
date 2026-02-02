@@ -1,11 +1,30 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideToastr } from 'ngx-toastr';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor])),
+    provideAnimationsAsync(),
+    provideCharts(withDefaultRegisterables()),
+    provideToastr({
+      timeOut: 5000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      progressBar: true,
+      closeButton: true,
+      newestOnTop: true,
+      tapToDismiss: true,
+      enableHtml: false
+    })
   ]
 };

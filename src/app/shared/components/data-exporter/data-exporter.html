@@ -1,0 +1,30 @@
+<div class="exporter-container">
+    <div class="exporter-header">
+        <h3>{{ title }}</h3>
+        <button (click)="exportToPdf()" class="export-btn">
+            <span class="icon">📄</span> Export to PDF
+        </button>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th *ngFor="let col of columns">{{ col.header }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of data">
+                    <td *ngFor="let col of columns">
+                        {{ getCellValue(row, col) }}
+                    </td>
+                </tr>
+                <tr *ngIf="data.length === 0">
+                    <td [attr.colspan]="columns.length" class="no-data">
+                        No data available for this report.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

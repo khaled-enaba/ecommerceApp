@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+    <!-- Header with Admin Info and Notifications -->
+    <header class="overview-header">
+        <div>
+            <h1>Dashboard Overview</h1>
+            <p class="subtitle">Welcome back to your ecommerce management system</p>
+        </div>
+        <div class="header-right">
+            <app-notification-panel></app-notification-panel>
+            <div class="admin-profile" *ngIf="auth.currentUser()" routerLink="/dashboard/profile">
+                <span class="admin-name">{{ auth.currentUser()!.name }}</span>
+                <div class="admin-avatar">
+                    {{ getInitials(auth.currentUser()!.name) }}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Stats Grid -->
+    <div class="stats-grid" *ngIf="!isLoading()">
+        <div class="stat-card">
+            <label>Total Users</label>
+            <div class="value">{{ stats().totalUsers | number }}</div>
+        </div>
+        <div class="stat-card">
+            <label>Total Products</label>
+            <div class="value">{{ stats().totalProducts | number }}</div>
+        </div>
+        <div class="stat-card">
+            <label>Total Orders</label>
+            <div class="value">{{ stats().totalOrders | number }}</div>
+        </div>
+        <div class="stat-card revenue">
+            <label>Revenue</label>
+            <div class="value">{{ stats().totalRevenue | currency }}</div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="dashboard-loading" *ngIf="isLoading()">
+        <div class="spinner"></div>
+        <p>Loading Dashboard...</p>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section" *ngIf="!isLoading()">
+        <!-- Sales Trends Chart -->
+        <div class="chart-container full-width">
+            <h3>Sales Trend (Last 7 Days)</h3>
+            <div class="canvas-wrapper">
+                <canvas baseChart [data]="salesTrendData()" [options]="salesTrendOptions" [type]="'line'">
+                </canvas>
+            </div>
+        </div>
+
+        <!-- Orders by Status -->
+        <div class="chart-container">
+            <h3>Orders by Status</h3>
+            <div class="canvas-wrapper doughnut-wrapper">
+                <canvas baseChart [data]="ordersStatusDataConfig()" [options]="ordersStatusOptions" [type]="'doughnut'">
+                </canvas>
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="chart-container">
+            <h3>Top 5 Products by Sales</h3>
+            <div class="canvas-wrapper">
+                <canvas baseChart [data]="topProductsChartDataConfig()" [options]="topProductsOptions" [type]="'bar'">
+                </canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Alerts -->
+    <div class="alerts-section" *ngIf="!isLoading() && alerts.totalAlerts() > 0">
+        <h3>⚠️ Low Stock Alerts ({{ alerts.totalAlerts() }})</h3>
+        <div class="alerts-grid">
+            @for (alert of alerts.criticalAlerts(); track alert.currentStock; let i = $index) {
+            @if (i <= 3) { <div class="alert-card critical">
+                <div class="alert-level">CRITICAL</div>
+                <div class="alert-product">{{ alert.productName }}</div>
+                <div class="alert-stock">Stock: {{ alert.currentStock }} units</div>
+        </div>
+        }}
+        @for (alert of alerts.warningAlerts(); track alert.currentStock; let i = $index) {
+        @if (i < 2) { <div class="alert-card warning">
+            <div class="alert-level">WARNING</div>
+            <div class="alert-product">{{ alert.productName }}</div>
+            <div class="alert-stock">Stock: {{ alert.currentStock }} units</div>
+    </div>
+    }
+    }
+</div>
+</div>
+
+<!-- Notification Badges -->
+<div class="quick-stats" *ngIf="!isLoading()">
+    <div class="quick-stat" *ngIf="notifications.newOrders().length > 0">
+        <span class="badge">{{ notifications.newOrders().length }}</span>
+        <span class="label">New Orders</span>
+    </div>
+    <div class="quick-stat" *ngIf="notifications.stockAlerts().length > 0">
+        <span class="badge alert">{{ notifications.stockAlerts().length }}</span>
+        <span class="label">Stock Alerts</span>
+    </div>
+    <div class="quick-stat" *ngIf="notifications.newReviews().length > 0">
+        <span class="badge">{{ notifications.newReviews().length }}</span>
+        <span class="label">New Reviews</span>
+    </div>
+    <div class="quick-stat" *ngIf="notifications.messages().length > 0">
+        <span class="badge">{{ notifications.messages().length }}</span>
+        <span class="label">Messages</span>
+    </div>
+</div>
+</div>

@@ -1,0 +1,87 @@
+.reports-container {
+    padding: 30px;
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+.reports-header h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.reports-header p {
+    color: #64748b;
+    margin-top: 8px;
+    margin-bottom: 30px;
+}
+
+.tabs-navigation {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+    background: #fff;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    width: fit-content;
+}
+
+.tabs-navigation button {
+    padding: 10px 20px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tabs-navigation button:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.tabs-navigation button.active {
+    background: #4f46e5;
+    color: white;
+}
+
+.report-content {
+    position: relative;
+    min-height: 300px;
+}
+
+.loader-overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    gap: 15px;
+    color: #64748b;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #4f46e5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,0 +1,214 @@
+.catalog-page {
+    background: #fff;
+    min-height: 100vh;
+}
+
+/* Luxury Hero */
+.catalog-hero {
+    background: #121212;
+    color: #fff;
+    padding: 100px 0 60px;
+    margin-bottom: 60px;
+    border-radius: 0 0 40px 40px;
+}
+
+.hero-inner {
+    display: flex;
+    justify-content:space-around;
+    align-items: flex-end;
+    gap: 40px;
+}
+
+.hero-text h1 {
+    font-size: 4.5rem;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 0.9;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.hero-text p {
+    font-size: 1.1rem;
+    opacity: 0.6;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Integrated Search */
+.catalog-search {
+    flex-grow: 1;
+    max-width: 500px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+}
+
+.catalog-search input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 15px 25px;
+    width: 100%;
+    font-size: 1rem;
+    outline: none;
+}
+
+.search-btn {
+    background: #fff;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+/* Layout */
+.catalog-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+}
+
+/* Sidebar Glassmorphism */
+.catalog-sidebar {
+    position: sticky;
+    top: 120px;
+    height: max-content;
+    background: #fcfcfd;
+    padding: 40px;
+    border-radius: 30px;
+    border: 1px solid #f0f0f0;
+}
+
+.filter-title {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+    color: #888;
+}
+
+.pill-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pill-link {
+    text-decoration: none;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 16px 20px;
+    border-radius: 20px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.pill-link .dot {
+    width: 6px;
+    height: 6px;
+    background: #ddd;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.pill-link:hover {
+    background: #fff;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transform: translateX(5px);
+}
+
+.pill-link.active {
+    background: #000;
+    color: #fff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.pill-link.active .dot {
+    background: #fff;
+    transform: scale(1.5);
+}
+
+/* Grid & Main */
+.products-container {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.grid-animation-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Pagination */
+.catalog-footer {
+    padding: 100px 0;
+}
+
+.pagination-rack {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.page-control {
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    color: #000;
+    font-weight: 900;
+    border-radius: 20px;
+    border: 2px solid #f0f0f0;
+    transition: all 0.3s;
+}
+
+.page-control:hover {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+}
+
+.page-control.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+    transform: scale(1.15);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .catalog-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hero-text h1 {
+        font-size: 3rem;
+    }
+}

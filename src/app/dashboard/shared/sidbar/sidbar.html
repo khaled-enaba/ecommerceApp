@@ -1,0 +1,38 @@
+<div class="sidebar">
+    <div class="logo">Admin Panel</div>
+
+    <ul class="nav-menu">
+        <li routerLink="/dashboard/home" routerLinkActive="active" class="nav-item">
+            <span>📊 </span> Dashboard
+        </li>
+        <li routerLink="/dashboard/users" routerLinkActive="active" class="nav-item">
+            <span>👤 </span> User Management
+        </li>
+        <li routerLink="/dashboard/products" routerLinkActive="active" class="nav-item">
+            <span>🛍️ </span> Products
+        </li>
+        <li routerLink="/dashboard/reports" routerLinkActive="active" class="nav-item">
+            <span>📊 </span> Reports
+        </li>
+        <li routerLink="/dashboard/orders" routerLinkActive="active" class="nav-item">
+            <span>📦 </span> Orders
+        </li>
+        <li routerLink="/dashboard/returns" routerLinkActive="active" class="nav-item">
+            <span>↩️ </span> Returns
+        </li>
+        <li routerLink="/dashboard/reviews" routerLinkActive="active" class="nav-item">
+            <span>⭐ </span> Reviews
+        </li>
+        
+
+    </ul>
+    <div class="nav-footer">
+        <li routerLink="/home" routerLinkActive="active" class="nav-item">
+            <span>🏠 </span> back to store
+        </li>
+    </div>
+    <div class="nav-footer">
+        <li class="nav-item logout" (click)="onLogout()">🚪 Logout</li>
+    </div>
+    <br>
+</div>

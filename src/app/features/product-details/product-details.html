@@ -1,0 +1,62 @@
+<div class="product-details-container">
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading Product Excellence...</p>
+    </div>
+
+    <div *ngIf="!isLoading && product" class="product-grid">
+        <!-- Left Column: Details -->
+        <div class="product-info">
+            <nav class="breadcrumb">
+                <a routerLink="/home">Store</a> / <span>{{ product.categoryId.name }}</span>
+            </nav>
+
+            <h1 class="product-name">{{ product.name }}</h1>
+            <div class="price-tag">{{ product.price | currency:'EGP':'symbol':'1.0-2' }}</div>
+
+            <div class="divider"></div>
+
+            <p class="product-desc">{{ product.description }}</p>
+
+            <!-- Stock Warning: only if <= 3 -->
+            <div class="stock-status" *ngIf="product.stock <= 3">
+                <span class="warning-badge" *ngIf="product.stock > 0">
+                    <i class="icon">⚠️</i> Only {{ product.stock }} items left in stock!
+                </span>
+                <span class="out-of-stock-badge" *ngIf="product.stock === 0">
+                    Currently Out of Stock
+                </span>
+            </div>
+
+            <div class="purchase-controls" *ngIf="product.stock > 0">
+                <div class="quantity-input-group">
+                    <label for="quantity">Quantity</label>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" (click)="decreaseQuantity()" [disabled]="quantity <= 1">−</button>
+                        <input type="number" id="quantity" [(ngModel)]="quantity" min="1" [max]="product.stock"
+                            readonly>
+                        <button class="qty-btn" (click)="increaseQuantity()"
+                            [disabled]="quantity >= product.stock">+</button>
+                    </div>
+                </div>
+
+                <button class="add-btn" (click)="addToCart()">
+                    <span class="btn-text">Add to Cart</span>
+                    <span class="btn-icon">🛒</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Column: Big Image -->
+        <div class="product-visual">
+            <div class="image-glass">
+                <img [src]="getSafeImage(product.image)" [alt]="product.name" class="main-image">
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && !product" class="error-state">
+        <h2>Oops! Product not found.</h2>
+        <button routerLink="/home" class="back-btn">Return to Shop</button>
+    </div>
+</div>

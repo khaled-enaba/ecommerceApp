@@ -119,7 +119,7 @@ export class Users {
 
     if (this.isEditing()) {
       // Update existing user
-      this.userService.updateUser(user.id!, user).subscribe({
+      this.userService.updateUser(user._id!, user).subscribe({
         next: () => {
           this.reloadTrigger.next();
           this.closeModal();
@@ -166,7 +166,7 @@ export class Users {
       return;
     }
 
-    this.userService.resetPassword(this.currentUser().id!, pwd).subscribe({
+    this.userService.resetPassword(this.currentUser()._id!, pwd).subscribe({
       next: () => {
         this.closePasswordModal();
         this.toastr.success('Password updated successfully');

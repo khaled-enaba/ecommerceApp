@@ -114,6 +114,10 @@
   margin-left: 4px;
 }
 
+.km {
+  cursor: pointer;
+}
+
 .menu-btn {
   display: none;
   font-size: 1.5rem;

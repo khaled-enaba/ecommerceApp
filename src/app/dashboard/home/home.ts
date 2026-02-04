@@ -197,7 +197,6 @@ export class Home implements OnDestroy {
           status?.cancelled || 0,
           status?.returned || 0,
           status?.rejected || 0,
-          status?.completed || 0
         ],
         backgroundColor: [
           '#f6c23e', // Pending (Yellow)
@@ -206,7 +205,6 @@ export class Home implements OnDestroy {
           '#e74a3b', // Cancelled (Red)
           '#fd7e14', // Returned (Orange)
           '#858796', // Rejected (Gray)
-          '#1cc88a'  // Completed (Green)
         ],
         hoverOffset: 4
       }]
